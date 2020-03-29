@@ -1,0 +1,18 @@
+
+.users {
+  font-size: 13px;
+  height: 50px;
+  vertical-align: middle;
+}
+
+.you {
+  float: left;
+}
+
+.opponent {
+  float: right;
+}
+
+.message {
+  font-size: 10px;
+}
