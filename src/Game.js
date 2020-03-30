@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import Board from './Board';
 import './Game.css';
 import Cell from './Cell';
@@ -10,19 +10,30 @@ function Game(params) {
   const INIT_VALUES = [...Array(N_ROWS)].map(e => new Array(N_COLS).fill('e'));
   const [cells, setCells] = useState(INIT_VALUES);  
   const [currentPlayer, setCurrentPlayer] = useState(params.player1);
-  const [currentPlayerColor, setCurrentPlayerColor] = useState(playerColor(params.player1));
   const [gameOver, setGameOver] = useState(false);
+  const isNetworkGame = params.player1Local !== params.player2Local;
+
+  useEffect(() => {
+    if (!params.player1Local) params.messenger.on('player1-select', data => select(data.i, data.j));
+    if (!params.player2Local) params.messenger.on('player2-select', data => select(data.i, data.j));
+    return () => {
+      if (!params.player1Local) params.messenger.off('player1-select');
+      if (!params.player2Local) params.messenger.off('player2-select');
+    }
+  }, [currentPlayer]);
+
   function removeHoverIndicator() {
-    const hoverColor = currentPlayerColor + 'l';
+    const hoverColor = playerColor(currentPlayer) + 'l';
     for (var i = 0; i < N_ROWS; i++) for (var j = 0; j < N_COLS; j++)
       if (cells[i][j] === hoverColor)
         cells[i][j] = 'e';
   }
+
   function onHover(j) {
     removeHoverIndicator();
     const i = lowestEmptyCell(j);
     if (i < 0) return;
-    cells[i][j] = currentPlayerColor + 'l';
+    cells[i][j] = playerColor(currentPlayer) + 'l';
     setCells(cells.slice());
   }
 
@@ -39,7 +50,12 @@ function Game(params) {
       console.log('Column does not have empty cell');
       return;
     }
-    cells[i][j] = currentPlayerColor;
+    if (isNetworkGame) params.messenger.send(currentPlayerId() + '-select', {i, j});
+    select(i, j);
+  }
+
+  function select(i, j) {
+    cells[i][j] = playerColor(currentPlayer);
     setCells(cells.slice());
     var result = checkEnd(cells);
     if (result !== null) {
@@ -49,7 +65,6 @@ function Game(params) {
     }
     const nextPlayer = otherPlayer(currentPlayer);
     setCurrentPlayer(nextPlayer);
-    setCurrentPlayerColor(playerColor(nextPlayer));
   }
 
   function otherPlayer(player) {
@@ -64,6 +79,14 @@ function Game(params) {
     return color === 'b' ? params.player1 : params.player2;
   }
 
+  function isCurrentPlayerLocal() {
+    return (currentPlayer === params.player1 && params.player1Local) || (currentPlayer === params.player2 && params.player2Local);
+  }
+
+  function currentPlayerId() {
+    return currentPlayer === params.player1 ? 'player1' : 'player2';
+  }
+
   return (<>
     <div className="users">
       <span className="you"><Cell type='b'/>{params.player1}</span>
@@ -72,7 +95,7 @@ function Game(params) {
     <div className="message">{currentPlayer} turn</div>
     <button onClick={params.onExit}>Exit</button>
     <div style={{margin: '30px'}}>
-      <Board enable={!gameOver} cells={cells} onHover={onHover} onClick={onClick} />
+      <Board enable={!gameOver && isCurrentPlayerLocal()} cells={cells} onHover={onHover} onClick={onClick} />
     </div>
   </>);
 }
