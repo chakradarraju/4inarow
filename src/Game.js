@@ -5,7 +5,7 @@ import Cell from './Cell';
 import checkEnd from './counter';
 
 function Game(params) {
-  const N_ROWS = 7;
+  const N_ROWS = 6;
   const N_COLS = 7;
   const INIT_VALUES = [...Array(N_ROWS)].map(e => new Array(N_COLS).fill('e'));
   const [cells, setCells] = useState(INIT_VALUES);  
@@ -39,7 +39,7 @@ function Game(params) {
 
   function lowestEmptyCell(j) {
     var i = N_ROWS - 1;
-    while (cells[i][j] !== 'e' && i > 0) i--;
+    while (i >= 0 && cells[i][j] !== 'e') i--;
     return i;
   }
 
@@ -55,6 +55,7 @@ function Game(params) {
   }
 
   function select(i, j) {
+    console.log('selecting', i, j);
     cells[i][j] = playerColor(currentPlayer);
     setCells(cells.slice());
     var result = checkEnd(cells);
