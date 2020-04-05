@@ -10,8 +10,14 @@ function Game(params) {
   const INIT_VALUES = [...Array(N_ROWS)].map(e => new Array(N_COLS).fill('e'));
   const [cells, setCells] = useState(INIT_VALUES);  
   const [currentPlayer, setCurrentPlayer] = useState(params.player1);
-  const [gameOver, setGameOver] = useState(false);
+  const [gameResult, setGameResult] = useState(null);
   const isNetworkGame = params.player1Local !== params.player2Local;
+  const [message, setMessage] = useState('');
+  const peerConnected = true;
+
+  useEffect(() => {
+    setMessage(gameResult !== null ? gameResult : currentPlayer + ' turn');
+  }, [currentPlayer, gameResult]);
 
   useEffect(() => {
     if (!params.player1Local) params.messenger.on('player1-select', data => select(data.i, data.j));
@@ -59,11 +65,7 @@ function Game(params) {
     cells[i][j] = playerColor(currentPlayer);
     setCells(cells.slice());
     var result = checkEnd(cells);
-    if (result !== null) {
-      if (result !== 'tie') result = playerName(result) + ' won';
-      alert(result);
-      setGameOver(true);
-    }
+    if (result !== null) setGameResult(result === 'tie' ? 'tie' : playerName(result) + ' won');
     const nextPlayer = otherPlayer(currentPlayer);
     setCurrentPlayer(nextPlayer);
   }
@@ -88,15 +90,25 @@ function Game(params) {
     return currentPlayer === params.player1 ? 'player1' : 'player2';
   }
 
+  function shouldEnableGame() {
+    if (gameResult !== null) return false;  // If game has ended, disable
+    
+    // Game is going on.
+    if (!isNetworkGame) return true;  // If it is local game, it is always enabled.
+    
+    // Network game
+    return peerConnected && isCurrentPlayerLocal();
+  }
+
   return (<>
     <div className="users">
       <span className="you"><Cell type='b'/>{params.player1}</span>
       <span className="opponent">{params.player2}<Cell type='r'/></span>
     </div>
-    <div className="message">{currentPlayer} turn</div>
+    <div className="message">{message}</div>
     <button onClick={params.onExit}>Exit</button>
     <div style={{margin: '30px'}}>
-      <Board enable={!gameOver && isCurrentPlayerLocal()} cells={cells} onHover={onHover} onClick={onClick} />
+      <Board enable={shouldEnableGame()} cells={cells} onHover={onHover} onClick={onClick} />
     </div>
   </>);
 }

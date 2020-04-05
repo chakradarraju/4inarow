@@ -41,7 +41,6 @@ function Start(params) {
         params.messenger.on('player1-name', name => params.setPlayer1(name));
       } else {
         setIsHost(true);
-        params.messenger.expectConnect();
         params.messenger.on('player2-name', name => params.setPlayer2(name));
       }
       if (params.messenger.peerConnected) onPeerConnected();
@@ -49,11 +48,13 @@ function Start(params) {
     });
   }, []);
 
-  function onPeerConnected() {
-    setPeerConnected(true);
-    setShowLocal(false);
-    params.messenger.send('player1-name', params.player1);
-    params.messenger.send('player2-name', params.player2);
+  function onPeerConnected(connected) {
+    setPeerConnected(connected);
+    if (connected) {
+      setShowLocal(false);
+      params.messenger.send('player1-name', params.player1);
+      params.messenger.send('player2-name', params.player2);  
+    }
   }
 
   useEffect(() => {
