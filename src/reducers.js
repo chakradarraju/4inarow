@@ -34,6 +34,26 @@ export function gameId(state = null, action) {
   }
 }
 
+export function settingUpNewGame(state = false, action) {
+  switch (action.type) {
+    case 'SETUP_NEW_GAME':
+      return true;
+    case 'DONE_SETUP_GAME':
+      return false;
+    default:
+      return state;
+  }
+}
+
+export function peerGameId(state = null, action) {
+  switch (action.type) {
+    case 'SET_PEER_GAME_ID':
+      return action.peerGameId;
+    default:
+      return state;
+  }
+}
+
 export function networkGame(state = false, action) {
   switch (action.type) {
     case 'SET_NETWORK_GAME':
@@ -142,8 +162,6 @@ export function hostId(state = null, action) {
   switch (action.type) {
     case 'SET_HOST':
       return action.hostId;
-    case 'REMOVE_HOST':
-      return null;
     default:
       return state;
   }

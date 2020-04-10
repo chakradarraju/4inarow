@@ -4,7 +4,7 @@ import './Game.css';
 import Cell from './Cell';
 import { NO_RESULT, TIE, PLAYER1_WON, PLAYER2_WON } from './counter';
 import {connect} from 'react-redux';
-import {playerColor} from './common';
+import {playerColor, otherPlayer} from './common';
 import * as actions from './actions';
 
 function Game(params) {
@@ -46,17 +46,24 @@ function Game(params) {
     }
   }
 
-  function otherPlayer() {
-    return player1Local ? params.player2Name : params.player1Name;
-  }
-
   function message() {
     if (params.gameResult === TIE) return 'Tie';
     if (params.gameResult === PLAYER1_WON) return params.player1Name + ' won';
     if (params.gameResult === PLAYER2_WON) return params.player2Name + ' won';
-    if (params.networkGame && !params.peerConnected) return otherPlayer() + ' disconnected';
+    if (params.networkGame) {
+      if (!params.peerConnected) return otherPlayer(params) + ' disconnected';
+      if (params.peerConnected && params.peerGameId !== params.gameId) return otherPlayer(params) + ' left the game';
+    }
     if (params.player1Turn) return params.player1Name + ' turn';
     return params.player2Name + ' turn';
+  }
+
+  function onExit() {
+    if (window.confirm('Are you sure you want to exit game?')) params.exitGame();
+  }
+
+  function setupNew() {
+    if (window.confirm('Start new game?')) params.setupNewGame();
   }
 
   return (<>
@@ -65,7 +72,8 @@ function Game(params) {
       <span className="opponent">{params.player2Name}<Cell type={playerColor(false)} /></span>
     </div>
     <div className="message">{message()}</div>
-    <button onClick={params.exitGame}>Exit</button>
+    {(params.gameResult === NO_RESULT || !player1Local) && <button onClick={onExit}>Exit</button>}
+    {params.gameResult !== NO_RESULT && player1Local && <button onClick={setupNew}>Start new</button>}
     <div style={{margin: '30px'}}>
       <Board enable={shouldEnableBoard()} cells={params.cells} onHover={onHover} onClick={onClick} />
     </div>

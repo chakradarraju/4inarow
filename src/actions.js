@@ -20,7 +20,9 @@ export const togglePlayer = () => ({type: 'TOGGLE_PLAYER'});
 
 export const setHostId = hostId => ({type: 'SET_HOST', hostId});
 
-export const removeHostId = () => ({type: 'REMOVE_HOST'});
+export const setGameId = gameId => ({type: 'SET_GAME_ID', gameId});
+
+export const setPeerGameId = peerGameId => ({type: 'SET_PEER_GAME_ID', peerGameId});
 
 export const setNetworkGame = isNetworkGame => ({type: 'SET_NETWORK_GAME', isNetworkGame});
 
@@ -41,3 +43,7 @@ export const setPlayer2Name = name => ({type: 'SET_PLAYER2_NAME', name});
 export const startGame = () => ({type: 'GAME_STARTED'});
 
 export const exitGame = () => ({type: 'SHOW_START_SCREEN'});
+
+export const setupNewGame = () => ({type: 'SETUP_NEW_GAME'});
+
+export const doneSetupGame = () => ({type: 'DONE_SETUP_GAME'});

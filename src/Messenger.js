@@ -17,17 +17,19 @@ function Messenger(params) {
   useEffect(() => {
     const existingId = localStorage.getItem('client-id');
     const id = existingId ? existingId : shortid.generate();
-    localStorage.setItem('client-id', id);
+    if (id !== existingId) localStorage.setItem('client-id', id);
     params.updateClientId(id);
   }, []);
   
   useEffect(() => {
-    if (!params.myClientId) {
-      console.log('Not creating connection to server', params.myClientId);
-      return;
+    if (params.myClientId) {
+      if (serverConnection && params.myClientId === serverConnection.id) {
+        console.log('Id did not change', params.myClientId, serverConnection.id);
+        return;
+      }
+      console.log('Connecting to server with', params.myClientId);
+      setServerConnection(new Peer(params.myClientId, opts));
     }
-    console.log('Connecting to server with', params.myClientId);
-    setServerConnection(new Peer(params.myClientId, opts));
   }, [params.myClientId]);
 
   function onServerDisconnected() {
@@ -41,6 +43,7 @@ function Messenger(params) {
 
   useEffect(() => {
     if (!serverConnection || serverConnection.disconnected) {
+      console.log('Disconnected from server');
       params.resetServerConnection();
       onServerDisconnected();
     }
@@ -53,12 +56,13 @@ function Messenger(params) {
 
   useEffect(() => {
     if (!serverConnection) {
-      console.log('Skipping event handlers on invalid serverconnection', null);
+      console.log('Skipping event handlers on invalid serverconnection', serverConnection);
       return;
     }
     console.log('Setting up server connection');
     params.resetServerConnection();
     serverConnection.on('open', id => {
+      console.log('Successfully connected to server');
       params.successfulServerConnection();
     });
     serverConnection.on('error', err => {

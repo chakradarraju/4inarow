@@ -1,32 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {connect} from 'react-redux';
 import * as actions from './actions';
-const shortid = require('shortid');
+import {peerConnectionString} from './common';
 
 function Start(params) {
   const gameStrElement = useRef();
-  const gameStr = window.location + '#' + newGameStr();
   const [youStarted, setYouStarted] = useState(false);
   const [peerStarted, setPeerStarted] = useState(false);
-
-  function hasPeerLocation() {
-    return window.location.hash && window.location.hash.length > 0;
-  }
-
-  function parseGameStr(str) {
-    console.log('Parsing game str', str);
-    const parts = str.split('/');
-    return parts.length === 2 ? parts : [null, null];
-  }
-
-  function newGameStr() {
-    const gameId = shortid.generate();
-    return params.myClientId + '/' + gameId;
-  }
-
-  useEffect(() => {
-    params.setNetworkGame(hasPeerLocation());
-  }, []);
 
   function processMessage(message) {
     if (message.msg === 'ask-player1-name') {
@@ -53,19 +33,6 @@ function Start(params) {
     if (!params.inMessages) return;
     for (var message of params.inMessages) if (!message.ack) processMessage(message);
   }, [params.inMessages, params.hostId]);
-
-  useEffect(() => {
-    if (hasPeerLocation()) {
-      const [hostId, gameId] = parseGameStr(window.location.hash.substr(1));
-      if (hostId === null) {
-        console.log('Invalid game str');
-        return;
-      }
-      params.setHostId(hostId);
-    } else {
-      params.removeHostId();
-    }
-  }, [params.serverConnected]);
 
   useEffect(() => {
     if (params.peerConnected) {
@@ -120,7 +87,7 @@ function Start(params) {
         </div>
         {!params.peerConnected && <>
           Ask your friend to open:<br/>
-          <input ref={gameStrElement} readOnly value={gameStr} /><button onClick={copyGameStr}>Copy</button>
+          <input ref={gameStrElement} readOnly value={peerConnectionString(params)} /><button onClick={copyGameStr}>Copy</button>
           <div>Waiting for peer...</div>
         </>}
       </>}
