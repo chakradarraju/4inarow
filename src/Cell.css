@@ -6,22 +6,22 @@
   margin: 4px;
 }
 
-.e {
+.a {
   background-color: black;
 }
 
-.r {
+.b {
   background-color: #FF0000;
 }
 
-.b {
+.c {
   background-color: #0000FF;
 }
 
 .bl {
-  background-color: #6666FF;
+  background-color: #FF6666;
 }
 
-.rl {
-  background-color: #FF6666;
+.cl {
+  background-color: #6666FF;
 }

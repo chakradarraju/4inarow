@@ -1,69 +1,71 @@
+import {playerColor} from './common';
+export const NO_RESULT = 0;
+export const TIE = 1;
+export const PLAYER1_WON = 2;
+export const PLAYER2_WON = 3;
+
+const player1Color = playerColor(true);
+const emptyColor = 'a';
 
 class Counter {
   constructor() {
     this.reset();
+    this.result = NO_RESULT;
   }
 
   reset() {
-    this.n = 0;
-    this.c = '';
+    this.count = 0;
+    this.prevColor = emptyColor;
   }
 
-  count(cc) {
-    if (this.c === cc) {
-      this.n++;
-      if (this.n === 4) return true;
-    } else {
-      this.c = cc;
-      this.n = 1;
-    }
-    return false;
+  inc() {
+    this.count++;
+    if (this.count === 4) this.setWinner();
   }
 
-  currentColor() {
-    return this.c;
+  setWinner() {
+    this.result = this.prevColor === player1Color ? PLAYER1_WON : PLAYER2_WON;
   }
+
+  updateColor(color) {
+    this.prevColor = color;
+    this.count = 1;
+  }
+
+  put(color) {
+    if (color === emptyColor) this.reset();
+    else if (color === this.prevColor) this.inc();
+    else this.updateColor(color);
+    return this.result;
+  }
+}
+
+function boardFull(cells, rows, cols) {
+  for (var i = 0; i < rows; i++) for (var j = 0; j < cols; j++) if (cells[i][j] === emptyColor) return false;
+  return true;
 }
 
 function checkEnd(cells) {
   const N_ROWS = cells.length;
   const N_COLS = cells[0].length;
   const counter = new Counter();
-  var ne = 0;
+  if (boardFull(cells, N_ROWS, N_COLS)) return TIE;
   for (var i = 0; i < N_ROWS; i++) {
     counter.reset();
-    for (var j = 0; j < N_COLS; j++) {
-      if (cells[i][j] === 'e') {
-        ne++;
-        counter.reset();
-      } else {
-        if (counter.count(cells[i][j])) {
-          return counter.currentColor();
-        }          
-      }
-    }
+    for (var j = 0; j < N_COLS; j++)
+      if (counter.put(cells[i][j]) !== NO_RESULT) return counter.result;
   }
-  if (ne === 0) return 'tie';
   for (var j = 0; j < N_COLS; j++) {
     counter.reset();
-    for (var i = 0; i < N_ROWS; i++) {
-      if (cells[i][j] !== 'e') {
-        if (counter.count(cells[i][j])) {
-          return counter.currentColor();
-        }
-      } else counter.reset();
-    }
+    for (var i = 0; i < N_ROWS; i++)
+      if (counter.put(cells[i][j]) !== NO_RESULT) return counter.result;
   }
   for (var d = 0; d < N_ROWS + N_COLS; d++) {
     counter.reset();
     for (var i = 0; i < N_ROWS; i++) {
       const j = d - i;
       if (j < 0 || j >= N_COLS) continue;
-      if (cells[i][j] !== 'e') {
-        if (counter.count(cells[i][j])) {
-          return counter.currentColor();
-        }
-      } else counter.reset();
+      if (counter.put(cells[i][j]) !== NO_RESULT) return counter.result;
     }
   }
   for (var d = -N_ROWS; d < N_COLS; d++) {
@@ -71,14 +73,10 @@ function checkEnd(cells) {
     for (var i = 0; i < N_ROWS; i++) {
       const j = d + i;
       if (j < 0 || j >= N_COLS) continue;
-      if (cells[i][j] !== 'e') {
-        if (counter.count(cells[i][j])) {
-          return counter.currentColor();
-        }
-      } else counter.reset();
+      if (counter.put(cells[i][j]) !== NO_RESULT) return counter.result;
     }
   }
-  return null;
+  return NO_RESULT;
 }
 
 
