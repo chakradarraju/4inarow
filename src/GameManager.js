@@ -16,23 +16,26 @@ function GameManager(params) {
     setGameHash(window.location.hash.length > 1 ? window.location.hash.substr(1) : shortid.generate());
   }, []);
 
+  function processMessage(message) {
+    if (message.ack) return;
+    if (message.msg === 'peer-game-id') {
+      params.setPeerGameId(message.data);
+    } else if (message.msg === 'new-game') {
+      if (window.confirm(otherPlayer(params) + ' started a new game, join?')) {
+        const url = new URL(message.data);
+        const hash = url.hash.substr(1);
+        window.location.hash = hash;
+        setGameHash(hash);
+        params.exitGame();
+      }
+    } else if (message.msg === 'ask-peer-game-id') {
+      params.sendMessage('peer-game-id', params.gameId);
+    } else return;
+    params.ackMessage(message);
+  }
+
   useEffect(() => {
-    for (var message of params.inMessages) if (!message.ack) {
-      if (message.msg === 'peer-game-id') {
-        params.setPeerGameId(message.data);
-      } else if (message.msg === 'new-game') {
-        if (window.confirm(otherPlayer(params) + ' started a new game, join?')) {
-          const url = new URL(message.data);
-          const hash = url.hash.substr(1);
-          window.location.hash = hash;
-          setGameHash(hash);
-          params.exitGame();
-        }
-      } else if (message.msg === 'ask-peer-game-id') {
-        params.sendMessage('peer-game-id', params.gameId);
-      } else return;
-      params.ackMessage(message);
-    }
+    for (var i = 0; i < params.inMessages.length; i++) processMessage(params.inMessages[i]);
   }, [params.inMessages]);
 
   useEffect(() => {

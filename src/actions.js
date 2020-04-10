@@ -47,3 +47,7 @@ export const exitGame = () => ({type: 'SHOW_START_SCREEN'});
 export const setupNewGame = () => ({type: 'SETUP_NEW_GAME'});
 
 export const doneSetupGame = () => ({type: 'DONE_SETUP_GAME'});
+
+export const setCells = cells => ({type: 'SET_CELLS', cells});
+
+export const setPlayer1Turn = player1Turn => ({type: 'SET_PLAYER1_TURN', player1Turn});

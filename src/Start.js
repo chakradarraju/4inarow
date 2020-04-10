@@ -9,15 +9,8 @@ function Start(params) {
   const [peerStarted, setPeerStarted] = useState(false);
 
   function processMessage(message) {
-    if (message.msg === 'ask-player1-name') {
-      params.sendMessage('player1-name', params.player1Name);
-    } else if (message.msg === 'ask-player2-name') {
-      params.sendMessage('player2-name', params.player2Name);
-    } else if (message.msg === 'player1-name') {
-      if (params.hostId) params.setPlayer1Name(message.data);
-    } else if (message.msg === 'player2-name') {
-      if (!params.hostId) params.setPlayer2Name(message.data);
-    } else if (message.msg === 'peer-started') {
+    if (message.ack) return;
+    if (message.msg === 'peer-started') {
       console.log('Got peer started');
       setPeerStarted(true);
     } else if (message.msg === 'ask-peer-started') {
@@ -31,7 +24,7 @@ function Start(params) {
 
   useEffect(() => {
     if (!params.inMessages) return;
-    for (var message of params.inMessages) if (!message.ack) processMessage(message);
+    for (var i = 0; i < params.inMessages.length; i++) processMessage(params.inMessages[i]);
   }, [params.inMessages, params.hostId]);
 
   useEffect(() => {

@@ -98,6 +98,8 @@ export function cells(state = INIT_CELLS, action) {
       return state.slice();
     case 'GAME_STARTED':
       return getInitCells();
+    case 'SET_CELLS':
+      return action.cells;
     default:
       return state;
   }
@@ -120,6 +122,8 @@ export function player1Turn(state = true, action) {
       return !state;
     case 'GAME_STARTED':
       return true;
+    case 'SET_PLAYER1_TURN':
+      return action.player1Turn;
     default:
       return state;
   }
