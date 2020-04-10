@@ -46,16 +46,27 @@ function Game(params) {
     }
   }
 
+  function player1Reference() {
+    return params.networkGame && player1Local ? 'You' : params.player1Name;
+  }
+
+  function player2Reference() {
+    return params.networkGame && !player1Local ? 'You' : params.player2Name;
+  }
+
+  function possessiveForm(noun) {
+    return noun === 'You' ? 'Your' : (noun + "'s")
+  }
+
   function message() {
     if (params.gameResult === TIE) return 'Tie';
-    if (params.gameResult === PLAYER1_WON) return params.player1Name + ' won';
-    if (params.gameResult === PLAYER2_WON) return params.player2Name + ' won';
+    if (params.gameResult === PLAYER1_WON) return player1Reference() + ' won';
+    if (params.gameResult === PLAYER2_WON) return player2Reference() + ' won';
     if (params.networkGame) {
       if (!params.peerConnected) return otherPlayer(params) + ' disconnected';
       if (params.peerConnected && params.peerGameId !== params.gameId) return otherPlayer(params) + ' left the game';
     }
-    if (params.player1Turn) return params.player1Name + ' turn';
-    return params.player2Name + ' turn';
+    return possessiveForm(params.player1Turn ? player1Reference() : player2Reference()) + ' turn';
   }
 
   function onExit() {
@@ -68,8 +79,8 @@ function Game(params) {
 
   return (<>
     <div className="users">
-      <span className="you"><Cell type={playerColor(true)} />{params.player1Name}</span>
-      <span className="opponent">{params.player2Name}<Cell type={playerColor(false)} /></span>
+      <span className="you"><Cell type={playerColor(true)} />{player1Reference()}</span>
+      <span className="opponent">{player2Reference()}<Cell type={playerColor(false)} /></span>
     </div>
     <div className="message">{message()}</div>
     {(params.gameResult === NO_RESULT || !player1Local) && <button onClick={onExit}>Exit</button>}
