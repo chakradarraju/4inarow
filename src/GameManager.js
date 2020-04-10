@@ -23,10 +23,10 @@ function GameManager(params) {
     } else if (message.msg === 'new-game') {
       if (window.confirm(otherPlayer(params) + ' started a new game, join?')) {
         const url = new URL(message.data);
-        const hash = url.hash.substr(1);
-        window.location.hash = hash;
-        setGameHash(hash);
+        setGameHash(url.hash.substr(1));
         params.exitGame();
+      } else {
+        params.setupNewGame();
       }
     } else if (message.msg === 'ask-peer-game-id') {
       params.sendMessage('peer-game-id', params.gameId);
@@ -56,7 +56,7 @@ function GameManager(params) {
       console.log('Setting up new game');
       const gameId = shortid.generate();
       setGameHash(gameId);
-      params.sendMessage('new-game', peerConnectionString(params, gameId));
+      if (params.peerConnected) params.sendMessage('new-game', peerConnectionString(params, gameId));
       params.doneSetupGame();
       params.exitGame();
     }

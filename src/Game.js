@@ -11,11 +11,14 @@ function Game(params) {
   const player1Local = !params.hostId;
 
   useEffect(() => {
-    for (var message of params.inMessages) {
-      if (!message.ack && message.msg === 'select') {
+    for (var message of params.inMessages) if (!message.ack) {
+      if (message.msg === 'select') {
         select(message.data);
-        params.ackMessage(message);
+      } else if (message.msg === 'quit-game') {
+        alert(otherPlayer(params) + ' has quit game');
+        params.setupNewGame();
       }
+      params.ackMessage(message);
     }
   }, [params.inMessages]);
 
@@ -70,7 +73,10 @@ function Game(params) {
   }
 
   function onExit() {
-    if (window.confirm('Are you sure you want to exit game?')) params.exitGame();
+    if (window.confirm('Are you sure you want to exit game?')) {
+      if (params.networkGame) params.sendMessage('quit-game');
+      params.setupNewGame();
+    }
   }
 
   function setupNew() {
