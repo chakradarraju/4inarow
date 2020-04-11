@@ -210,3 +210,12 @@ export function player2Name(state = 'Player 2', action) {
       return state;
   }
 }
+
+export function duplicateClient(state = false, action) {
+  switch (action.type) {
+    case 'MARK_DUPLICATE_CLIENT':
+      return true;
+    default:
+      return state;
+  }
+}

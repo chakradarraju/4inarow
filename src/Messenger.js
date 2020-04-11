@@ -34,6 +34,10 @@ function Messenger(params) {
 
   function onServerDisconnected() {
     setTimeout(() => {
+      if (serverConnection && serverConnection.destroyed) {
+        console.error('Why is server connection destroyed?');
+        return;
+      }
       if (serverConnection && serverConnection.disconnected) {
         console.log('Trying to reconnect to server...');
         serverConnection.reconnect();
@@ -47,6 +51,7 @@ function Messenger(params) {
       params.resetServerConnection();
       onServerDisconnected();
     }
+    if (serverConnectionError && serverConnectionError.message.indexOf(params.myClientId) !== -1) params.markDuplicateClient();
     if (serverConnectionError && serverConnectionError.message.indexOf('Could not connect to peer') !== -1) tryPeerConnect();
   }, [serverConnectionError]);
 

@@ -60,40 +60,57 @@ function Start(params) {
     else params.sendMessage('ask-peer-started', {});
   }, [youStarted, peerStarted]);
 
+  function hostUI() {
+    return <>
+      <div style={{margin: '20px'}}>
+        <div>Name: {params.player1Name}<button onClick={() => params.setPlayer1Name(prompt("Your name"))}>Change</button></div>
+        <div>Opponent name: {params.player2Name}</div>
+      </div>
+      {!params.peerConnected && <>
+        Ask your friend to open:<br/>
+        <input ref={gameStrElement} readOnly value={peerConnectionString(params)} /><button onClick={copyGameStr}>Copy</button>
+        <div>Waiting for peer...</div>
+      </>}
+    </>
+  }
+
+  function peerUI() {
+    return <>
+      <div style={{margin: '20px'}}>
+        <div>Name: {params.player2Name}<button onClick={() => params.setPlayer2Name(prompt("Your name"))}>Change</button></div>
+        <div>Opponent name: {params.player1Name}</div>
+      </div>
+      {!params.peerConnected && <>Connecting to host...</>}
+    </>
+  }
+
+  function networkGameUI() {
+    if (params.duplicateClient) return <>You've already connected from another tab, maybe close other tabs of 4-in-a-row page?</>;
+    if (!params.serverConnected) return <>Connecting to server...</>;
+    return <>
+      {!params.hostId && hostUI()}
+      {params.hostId && peerUI()}
+      {params.peerConnected && youStarted && <div>Waiting for peer to start...</div>}
+      {params.peerConnected && !youStarted && <button onClick={() => setYouStarted(true)}>Start</button>}
+    </>
+  }
+
+  function localGameUI() {
+    return <>
+      Update your names and hit start to play!<br/><br/>
+      Player 1: {params.player1Name}<button onClick={() => params.setPlayer1Name(prompt("Player 1 name"))}>Change</button><br/>
+      Player 2: {params.player2Name}<button onClick={() => params.setPlayer2Name(prompt("Player 2 name"))}>Change</button><br/>
+      <button style={{margin: '30px'}} onClick={params.startGame}>Start</button>
+    </>
+  }
+
   return (<div style={{margin: '30px'}}>
     <div style={{margin: '30px'}}>
       <button style={{padding: params.networkGame ? '' : '5px'}} onClick={() => params.setNetworkGame(false)}>Local game</button>
       <button style={{padding: params.networkGame ? '5px' : ''}} onClick={() => params.setNetworkGame(true)}>Network game</button>
     </div>
-    {!params.networkGame && <>
-      Update your names and hit start to play!<br/><br/>
-      Player 1: {params.player1Name}<button onClick={() => params.setPlayer1Name(prompt("Player 1 name"))}>Change</button><br/>
-      Player 2: {params.player2Name}<button onClick={() => params.setPlayer2Name(prompt("Player 2 name"))}>Change</button><br/>
-      <button style={{margin: '30px'}} onClick={params.startGame}>Start</button>
-    </>}
-    {params.networkGame && <>
-      {!params.serverConnected && <div>Connecting to server...</div>}
-      {params.serverConnected && !params.hostId && <>
-        <div style={{margin: '20px'}}>
-          <div>Name: {params.player1Name}<button onClick={() => params.setPlayer1Name(prompt("Your name"))}>Change</button></div>
-          <div>Opponent name: {params.player2Name}</div>
-        </div>
-        {!params.peerConnected && <>
-          Ask your friend to open:<br/>
-          <input ref={gameStrElement} readOnly value={peerConnectionString(params)} /><button onClick={copyGameStr}>Copy</button>
-          <div>Waiting for peer...</div>
-        </>}
-      </>}
-      {params.serverConnected && params.hostId && <>
-        <div style={{margin: '20px'}}>
-          <div>Name: {params.player2Name}<button onClick={() => params.setPlayer2Name(prompt("Your name"))}>Change</button></div>
-          <div>Opponent name: {params.player1Name}</div>
-        </div>
-        {!params.peerConnected && <>Connecting to host...</>}
-      </>}
-      {params.serverConnected && params.peerConnected && youStarted && <div>Waiting for peer to start...</div>}
-      {params.serverConnected && params.peerConnected && !youStarted && <button onClick={() => setYouStarted(true)}>Start</button>}
-    </>}
+    {!params.networkGame && localGameUI()}
+    {params.networkGame && networkGameUI()}
   </div>);
 }
 
