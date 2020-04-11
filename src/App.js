@@ -13,7 +13,10 @@ function App(params) {
     <Messenger />
     <GameManager />
     <SyncAgent />
-    <div className="title">4 IN A ROW</div>
+    <div className="title">4 IN A ROW<div class="howto" title="
+    Game is played by 2 players taking alternate turns,
+    in his turn player chooses a column and a piece of their color is placed in lowest free cell,
+    first player to get 4 pieces of his color in a row (horizontal, vertical or diagonal) wins.">?</div></div>
     <div>
       {!params.gameStarted && <Start />}
       {params.gameStarted && <Game />}

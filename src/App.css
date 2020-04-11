@@ -8,3 +8,13 @@
   font-size: 25px;
   margin-top: 20px;
 }
+
+.howto {
+  border-radius: 50%;
+  text-align: center;
+  width: 30px;
+  height: 30px;
+  margin: 15px;
+  display: inline-block;
+  background-color: lightgreen;
+}
