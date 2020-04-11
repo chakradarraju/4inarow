@@ -47,7 +47,7 @@ function GameManager(params) {
       const [hostId, gameId] = parseGameId();
       params.setHostId(hostId);
       params.setGameId(gameId);  
-      params.sendMessage('peer-game-id', gameId);
+      if (params.networkGame) params.sendMessage('peer-game-id', gameId);
     }
   }, [gameHash]);
 
