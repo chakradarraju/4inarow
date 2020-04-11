@@ -66,6 +66,7 @@ function Game(params) {
     if (params.gameResult === PLAYER1_WON) return player1Reference() + ' won';
     if (params.gameResult === PLAYER2_WON) return player2Reference() + ' won';
     if (params.networkGame) {
+      if (!params.serverConnected) return "You're not connected to server, check internet";
       if (!params.peerConnected) return otherPlayer(params) + ' disconnected';
       if (params.peerConnected && params.peerGameId !== params.gameId) return otherPlayer(params) + ' left the game';
     }

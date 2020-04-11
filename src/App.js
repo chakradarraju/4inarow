@@ -6,7 +6,7 @@ import Messenger from './Messenger';
 import {connect} from 'react-redux';
 import GameManager from './GameManager';
 import SyncAgent from './SyncAgent';
-
+import ReactJson from 'react-json-view'
 
 function App(params) {
   return (<div className="App">
@@ -18,6 +18,7 @@ function App(params) {
       {!params.gameStarted && <Start />}
       {params.gameStarted && <Game />}
     </div>
+    {localStorage.getItem('4inarow_debug') && <ReactJson src={params} />}
   </div>);
 }
 
