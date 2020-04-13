@@ -4,7 +4,7 @@ import './Game.css';
 import Cell from './Cell';
 import { NO_RESULT, TIE, PLAYER1_WON, PLAYER2_WON } from './counter';
 import {connect} from 'react-redux';
-import {playerColor, otherPlayer} from './common';
+import {playerColor, otherPlayer, player1Reference, player2Reference, possessiveForm} from './common';
 import * as actions from './actions';
 
 function Game(params) {
@@ -47,18 +47,6 @@ function Game(params) {
     } else {  // Game over, disable board.
       return false;
     }
-  }
-
-  function player1Reference() {
-    return params.networkGame && player1Local ? 'You' : params.player1Name;
-  }
-
-  function player2Reference() {
-    return params.networkGame && !player1Local ? 'You' : params.player2Name;
-  }
-
-  function possessiveForm(noun) {
-    return noun === 'You' ? 'Your' : (noun + "'s")
   }
 
   function message() {

@@ -1,0 +1,15 @@
+.chat-root {
+    width: 80%;
+    margin: 0 auto;
+}
+
+.message.me {
+    width: 80%;
+    margin-left: auto;
+    text-align: right;
+}
+
+.message.other {
+    width: 80%;
+    text-align: left;
+}
