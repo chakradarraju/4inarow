@@ -33,9 +33,13 @@ function ChatWindow(params) {
   }
 
   return <div className="chat-root">
-    <div>Chat with {otherPlayerReference(params)}</div>
-    <input value={messageDraft} onKeyDown={onKeyDown} onChange={e => setMessageDraft(e.target.value)} />
-{messages.map((m, i) => <div key={i} className={"message " + m.from}>{(m.from === 'me' ? myReference : otherPlayerReference)(params)}: {m.data}</div>)}
+    <div>
+      Chat with {otherPlayerReference(params)}: 
+      <input value={messageDraft} onKeyDown={onKeyDown} onChange={e => setMessageDraft(e.target.value)} />
+    </div>
+    <div className="messages">
+      {messages.map((m, i) => <div key={i} className={"message " + m.from}>{(m.from === 'me' ? myReference : otherPlayerReference)(params)}: {m.data}</div>)}
+    </div>
   </div>;
 }
 
